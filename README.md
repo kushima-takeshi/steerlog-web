@@ -1,67 +1,75 @@
-# SteerLog Web
+# React + TypeScript + Vite
 
-SteerLog のフロントエンド用リポジトリです。  
-バックエンドは別リポジトリ: https://github.com/kushima-takeshi/steerlog-api
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-実装計画の正本: `steerlog-api` の `docs/12-frontend-plan.md`
+Currently, two official plugins are available:
 
-## 現在地
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-Phase 0 は **自分で作成する前提** です（雛形は入れていません）。
+## React Compiler
 
-## Phase 0（自分でやる手順）
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-ターミナルでこのディレクトリに移動してから実行します。
+## Expanding the ESLint configuration
 
-```bash
-cd ~/Desktop/steerlog-web
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+
 ```
 
-### 1. Vite + React + TypeScript プロジェクトを作る
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-空の git リポジトリの中に作るので、次のようにします。
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-```bash
-npm create vite@latest . -- --template react-ts
-```
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 
-聞かれたらそのまま進めて OK です。
-
-### 2. 依存関係を入れる
-
-```bash
-npm install
-```
-
-### 3. 起動して確認する
-
-```bash
-npm run dev
-```
-
-ブラウザで http://localhost:5173 を開き、Vite の初期画面が出れば成功です。
-
-### 4. 画面を SteerLog にする（任意・最初の練習）
-
-`src/App.tsx` を開いて、見出しを `SteerLog` に変えてみましょう。  
-保存すると画面が自動で更新されます（HMR）。
-
-### 5. できたらコミットする
-
-```bash
-git add -A
-git commit -m "chore: bootstrap Vite React TypeScript app"
-git push
-```
-
-## 次（Phase 1）
-
-API 疎通です。詰まったら `docs/12-frontend-plan.md` を見ながら相談してください。
-
-## API 側の起動（後で使う）
-
-```bash
-# steerlog-api 側
-docker compose up -d
-mvn spring-boot:run
 ```
