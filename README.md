@@ -18,7 +18,7 @@ SteerLog のフロントエンド用リポジトリです。
 - [x] Phase 2: 登録 / ログイン / JWT 保存
 - [x] Phase 3: 教材一覧 + 作成
 - [x] Phase 4: リソース詳細（統合詳細 API）
-- [ ] Phase 5: 学習フロー（振り返り）
+- [x] Phase 5: 学習フロー（振り返り IMMEDIATE_REFLECTION）
 
 ## セットアップ
 
