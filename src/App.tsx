@@ -7,11 +7,14 @@ import './App.css'
 
 
 function App() {
-  const [count, setCount] = useState(0)
   const [result, setResult] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [token, setToken] = useState(() => localStorage.getItem('token') ?? '')
+  const [resources, setResources] = useState<unknown[]>([])
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [description, setDescription] = useState('')
 
   async function handleRegister() {
     const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
@@ -27,6 +30,7 @@ function App() {
       const meRes = await fetchWithAuth('/auth/me', data.accessToken)
       const me = await meRes.json()
       setResult(JSON.stringify(me, null, 2))
+      await handleFetchResources(data.accessToken) 
     } catch {
       localStorage.removeItem('token')
       setToken('')
@@ -48,6 +52,39 @@ function App() {
       const meRes = await fetchWithAuth('/auth/me', data.accessToken)
       const me = await meRes.json()
       setResult(JSON.stringify(me, null, 2))
+      await handleFetchResources(data.accessToken) 
+    } catch {
+      localStorage.removeItem('token')
+      setToken('')
+      setResult('ログインし直してください')
+    }
+  }
+
+  async function handleFetchResources(authToken = token) {
+    try {
+      const res = await fetchWithAuth('/resources', authToken)
+      const data = await res.json()
+      setResources(data)
+    } catch {
+      localStorage.removeItem('token')
+      setToken('')
+      setResult('ログインし直してください')
+    }
+  }
+
+  async function handleCreateResource(authToken = token) {
+    try {
+      await fetchWithAuth('/resources', authToken, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resourceType: 'BOOK',
+          title,
+          author,
+          description,
+        }),
+      })
+      await handleFetchResources(authToken)  // 一覧を再取得
     } catch {
       localStorage.removeItem('token')
       setToken('')
@@ -78,6 +115,22 @@ function App() {
         <button type="button" onClick={handleLogin}>
           Login
         </button>
+        <button type="button" onClick={() => handleFetchResources()}>
+          Fetch Resources
+        </button>
+
+        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
+        <input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="Author" />
+        <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" />
+        <button type="button" onClick={() => handleCreateResource()}>
+          教材を作成
+        </button>
+
+        <ul>
+          {resources.map((resource, index) => (
+            <li key={index}>{(resource as { title?: string }).title ?? '(No title)'}</li>
+           ))}
+        </ul>
       </section>
 
       <div className="ticks"></div>
