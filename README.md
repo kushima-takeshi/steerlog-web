@@ -1,75 +1,57 @@
-# React + TypeScript + Vite
+# SteerLog Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SteerLog のフロントエンド用リポジトリです。  
+バックエンド API: https://github.com/kushima-takeshi/steerlog-api
 
-Currently, two official plugins are available:
+実装計画の正本: `steerlog-api` の [`docs/12-frontend-plan.md`](https://github.com/kushima-takeshi/steerlog-api/blob/main/docs/12-frontend-plan.md)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 技術スタック
 
-## React Compiler
+- React + TypeScript
+- Vite
+- fetch（認証付きリクエストは `src/api/client.ts`）
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 現在地
 
-## Expanding the ESLint configuration
+- [x] Phase 0: Vite + React + TS プロジェクト
+- [x] Phase 1: API 疎通
+- [x] Phase 2: 登録 / ログイン / JWT 保存
+- [ ] Phase 3: 教材一覧 + 作成
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## セットアップ
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+cd steerlog-web
+npm install
+cp .env.example .env
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+http://localhost:5173 で開きます。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 環境変数
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+`.env.example` をコピーして `.env` を作成してください。
 
+```bash
+VITE_API_BASE_URL=http://localhost:8080
 ```
+
+## API の起動（別リポジトリ）
+
+フロント単体では API は動きません。`steerlog-api` を起動してください。
+
+```bash
+cd steerlog-api
+docker compose up -d
+mvn spring-boot:run
+```
+
+## スクリプト
+
+| コマンド | 説明 |
+|----------|------|
+| `npm run dev` | 開発サーバー起動 |
+| `npm run build` | 本番ビルド |
+| `npm run lint` | ESLint |
+| `npm run preview` | ビルド結果のプレビュー |
