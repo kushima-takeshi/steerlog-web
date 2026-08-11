@@ -15,6 +15,8 @@ function App() {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [description, setDescription] = useState('')
+  const [selectedResourceId, setSelectedResourceId] = useState<number | null>(null)
+  const [resourceDetail, setResourceDetail] = useState<unknown | null>(null)
 
   async function handleRegister() {
     const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
@@ -92,6 +94,23 @@ function App() {
     }
   }
 
+  async function handleFetchResourceDetail(authToken = token) {
+    if (selectedResourceId === null) return
+  
+    try {
+      const res = await fetchWithAuth(
+        `/resources/${selectedResourceId}/details`,
+        authToken,
+      )
+      const data = await res.json()
+      setResourceDetail(data)
+    } catch {
+      localStorage.removeItem('token')
+      setToken('')
+      setResult('ログインし直してください')
+    }
+  }
+
   return (
     <>
       <section id="center">
@@ -127,10 +146,22 @@ function App() {
         </button>
 
         <ul>
-          {resources.map((resource, index) => (
-            <li key={index}>{(resource as { title?: string }).title ?? '(No title)'}</li>
-           ))}
+          {resources.map((resource, index) => {
+          const item = resource as { resourceId?: number; title?: string }
+          return (
+            <li key={item.resourceId ?? index}>
+              <button type="button" onClick={() => setSelectedResourceId(item.resourceId ?? null)}>
+                {item.title ?? '(No title)'}
+              </button>
+            </li>
+          )
+        })}
         </ul>
+        <p>Selected: {selectedResourceId ?? 'none'}</p>
+        <button type="button" onClick={() => handleFetchResourceDetail()}>
+          詳細を取得
+        </button>
+        <pre>{resourceDetail ? JSON.stringify(resourceDetail, null, 2) : '詳細なし'}</pre>
       </section>
 
       <div className="ticks"></div>
