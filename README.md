@@ -9,6 +9,7 @@ SteerLog のフロントエンド用リポジトリです。
 
 - React + TypeScript
 - Vite
+- React Router（Phase 6 から）
 - fetch（認証付きリクエストは `src/api/client.ts`）
 
 ## 現在地
@@ -19,6 +20,10 @@ SteerLog のフロントエンド用リポジトリです。
 - [x] Phase 3: 教材一覧 + 作成
 - [x] Phase 4: リソース詳細（統合詳細 API）
 - [x] Phase 5: 学習フロー（振り返り IMMEDIATE_REFLECTION）
+- [ ] Phase 6: 画面分割（React Router）
+- [ ] Phase 7: UI 改善（モック）
+
+詳細は [`docs/12-frontend-plan.md`](https://github.com/kushima-takeshi/steerlog-api/blob/main/docs/12-frontend-plan.md) の Phase 6〜8 を参照。
 
 ## セットアップ
 
