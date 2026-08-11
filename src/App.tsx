@@ -1,11 +1,59 @@
 import { useState } from 'react'
+import { fetchWithAuth } from './api/client'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
 
+
 function App() {
   const [count, setCount] = useState(0)
+  const [result, setResult] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [token, setToken] = useState(() => localStorage.getItem('token') ?? '')
+
+  async function handleRegister() {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+    const data = await res.json()
+    setToken(data.accessToken)
+    localStorage.setItem('token', data.accessToken)
+
+    try {
+      const meRes = await fetchWithAuth('/auth/me', data.accessToken)
+      const me = await meRes.json()
+      setResult(JSON.stringify(me, null, 2))
+    } catch {
+      localStorage.removeItem('token')
+      setToken('')
+      setResult('ログインし直してください')
+    }
+  }
+
+  async function handleLogin() {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+    const data = await res.json()
+    setToken(data.accessToken)
+    localStorage.setItem('token', data.accessToken)
+
+    try {
+      const meRes = await fetchWithAuth('/auth/me', data.accessToken)
+      const me = await meRes.json()
+      setResult(JSON.stringify(me, null, 2))
+    } catch {
+      localStorage.removeItem('token')
+      setToken('')
+      setResult('ログインし直してください')
+    }
+  }
 
   return (
     <>
@@ -17,16 +65,18 @@ function App() {
         </div>
         <div>
           <h1>SteerLog</h1>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+          <pre>{result}</pre>
           <p>
             Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
           </p>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+        <button type="button" onClick={handleRegister}>
+          Register
+        </button>
+        <button type="button" onClick={handleLogin}>
+          Login
         </button>
       </section>
 
