@@ -16,7 +16,9 @@ SteerLog のフロントエンド用リポジトリです。
 - [x] Phase 0: Vite + React + TS プロジェクト
 - [x] Phase 1: API 疎通
 - [x] Phase 2: 登録 / ログイン / JWT 保存
-- [ ] Phase 3: 教材一覧 + 作成
+- [x] Phase 3: 教材一覧 + 作成
+- [x] Phase 4: リソース詳細（統合詳細 API）
+- [ ] Phase 5: 学習フロー（振り返り）
 
 ## セットアップ
 
