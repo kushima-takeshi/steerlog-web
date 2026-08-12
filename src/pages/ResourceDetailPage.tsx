@@ -54,10 +54,7 @@ function ResourceDetailPage() {
       <button type="button" onClick={() => handleFetchResourceDetail()}>
         詳細を取得
       </button>
-      <button
-        type="button"
-        onClick={() => navigate('/', { state: { selectedResourceId: id } })}
-      >
+      <button type="button" onClick={() => navigate(`/resources/${id}/reflection`)}>
         振り返りへ
       </button>
       <pre>{resourceDetail ? JSON.stringify(resourceDetail, null, 2) : '詳細なし'}</pre>
