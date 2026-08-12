@@ -1,19 +1,15 @@
-import { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { fetchWithAuth } from '../api/client'
 import reactLogo from '../assets/react.svg'
 import viteLogo from '../assets/vite.svg'
 import heroImg from '../assets/hero.png'
 import '../App.css'
 
-
 function HomePage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [token, setToken] = useState(() => localStorage.getItem('token') ?? '')
-  const [resources, setResources] = useState<unknown[]>([])
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [description, setDescription] = useState('')
   const [selectedResourceId, setSelectedResourceId] = useState<number | null>(null)
   const [resourceDetail, setResourceDetail] = useState<unknown | null>(null)
   const [learningSessionId, setLearningSessionId] = useState<number | null>(null)
@@ -23,6 +19,13 @@ function HomePage() {
   const [completeResult, setCompleteResult] = useState<unknown | null>(null)
   const [recordResult, setRecordResult] = useState<unknown | null>(null)
 
+  useEffect(() => {
+    const id = (location.state as { selectedResourceId?: number | null })?.selectedResourceId
+    if (id != null) {
+      setSelectedResourceId(id)
+    }
+  }, [location.state])
+
   if (!token) {
     return <Navigate to="/login" replace />
   }
@@ -31,34 +34,6 @@ function HomePage() {
     localStorage.removeItem('token')
     setToken('')
     navigate('/login')
-  }
-
-  async function handleFetchResources(authToken = token) {
-    try {
-      const res = await fetchWithAuth('/resources', authToken)
-      const data = await res.json()
-      setResources(data)
-    } catch {
-      logout()
-    }
-  }
-
-  async function handleCreateResource(authToken = token) {
-    try {
-      await fetchWithAuth('/resources', authToken, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          resourceType: 'BOOK',
-          title,
-          author,
-          description,
-        }),
-      })
-      await handleFetchResources(authToken)
-    } catch {
-      logout()
-    }
   }
 
   async function handleFetchResourceDetail(authToken = token) {
@@ -79,7 +54,7 @@ function HomePage() {
   async function handleSaveRecord(authToken = token) {
     if (selectedResourceId === null || learningSessionId === null) return
     if (!completeResult) return
-  
+
     const draft = (completeResult as { resultDraft?: Record<string, unknown> }).resultDraft
     if (!draft) return
 
@@ -178,32 +153,10 @@ function HomePage() {
             Logout
           </button>
           <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
+            <Link to="/resources">教材一覧へ</Link>
           </p>
         </div>
-        <button type="button" onClick={() => handleFetchResources()}>
-          Fetch Resources
-        </button>
 
-        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
-        <input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="Author" />
-        <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" />
-        <button type="button" onClick={() => handleCreateResource()}>
-          教材を作成
-        </button>
-
-        <ul>
-          {resources.map((resource, index) => {
-          const item = resource as { resourceId?: number; title?: string }
-          return (
-            <li key={item.resourceId ?? index}>
-              <button type="button" onClick={() => setSelectedResourceId(item.resourceId ?? null)}>
-                {item.title ?? '(No title)'}
-              </button>
-            </li>
-          )
-        })}
-        </ul>
         <p>Selected: {selectedResourceId ?? 'none'}</p>
         <button type="button" onClick={() => handleFetchResourceDetail()}>
           詳細を取得

@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [result, setResult] = useState('')
 
   if (localStorage.getItem('token')) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/resources" replace />
   }
 
   async function handleRegister() {
@@ -26,7 +26,7 @@ export default function LoginPage() {
       const meRes = await fetchWithAuth('/auth/me', data.accessToken)
       const me = await meRes.json()
       setResult(JSON.stringify(me, null, 2))
-      navigate('/')
+      navigate('/resources')
     } catch {
       localStorage.removeItem('token')
       setResult('ログインし直してください')
@@ -46,7 +46,7 @@ export default function LoginPage() {
       const meRes = await fetchWithAuth('/auth/me', data.accessToken)
       const me = await meRes.json()
       setResult(JSON.stringify(me, null, 2))
-      navigate('/')
+      navigate('/resources')
     } catch {
       localStorage.removeItem('token')
       setResult('ログインし直してください')
