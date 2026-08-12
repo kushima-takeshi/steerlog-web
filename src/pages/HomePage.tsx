@@ -11,7 +11,6 @@ function HomePage() {
   const location = useLocation()
   const [token, setToken] = useState(() => localStorage.getItem('token') ?? '')
   const [selectedResourceId, setSelectedResourceId] = useState<number | null>(null)
-  const [resourceDetail, setResourceDetail] = useState<unknown | null>(null)
   const [learningSessionId, setLearningSessionId] = useState<number | null>(null)
   const [sessionStartResult, setSessionStartResult] = useState<unknown | null>(null)
   const [responseText, setResponseText] = useState('')
@@ -34,21 +33,6 @@ function HomePage() {
     localStorage.removeItem('token')
     setToken('')
     navigate('/login')
-  }
-
-  async function handleFetchResourceDetail(authToken = token) {
-    if (selectedResourceId === null) return
-
-    try {
-      const res = await fetchWithAuth(
-        `/resources/${selectedResourceId}/details`,
-        authToken,
-      )
-      const data = await res.json()
-      setResourceDetail(data)
-    } catch {
-      logout()
-    }
   }
 
   async function handleSaveRecord(authToken = token) {
@@ -158,10 +142,6 @@ function HomePage() {
         </div>
 
         <p>Selected: {selectedResourceId ?? 'none'}</p>
-        <button type="button" onClick={() => handleFetchResourceDetail()}>
-          詳細を取得
-        </button>
-        <pre>{resourceDetail ? JSON.stringify(resourceDetail, null, 2) : '詳細なし'}</pre>
 
         <button type="button" onClick={() => handleStartLearningSession()} disabled={selectedResourceId === null}>
           振り返りを開始

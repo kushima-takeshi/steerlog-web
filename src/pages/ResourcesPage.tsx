@@ -74,9 +74,11 @@ function ResourcesPage() {
             <li key={item.resourceId ?? index}>
               <button
                 type="button"
-                onClick={() =>
-                  navigate('/', { state: { selectedResourceId: item.resourceId ?? null } })
-                }
+                onClick={() => {
+                  if (item.resourceId != null) {
+                    navigate(`/resources/${item.resourceId}`)
+                  }
+                }}
               >
                 {item.title ?? '(No title)'}
               </button>
