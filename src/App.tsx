@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import HomePage from './pages/HomePage'
+import RootRedirect from './pages/RootRedirect'
 import LoginPage from './pages/LoginPage'
 import ReflectionPage from './pages/ReflectionPage'
 import ResourceDetailPage from './pages/ResourceDetailPage'
@@ -9,7 +9,7 @@ import './App.css'
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<RootRedirect />} />
       <Route path="/resources" element={<ResourcesPage />} />
       <Route path="/resources/:resourceId/reflection" element={<ReflectionPage />} />
       <Route path="/resources/:resourceId" element={<ResourceDetailPage />} />

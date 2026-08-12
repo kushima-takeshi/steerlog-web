@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom'
 
-function HomePage() {
+function RootRedirect() {
   const token = localStorage.getItem('token')
 
   if (!token) {
@@ -10,4 +10,4 @@ function HomePage() {
   return <Navigate to="/resources" replace />
 }
 
-export default HomePage
+export default RootRedirect
