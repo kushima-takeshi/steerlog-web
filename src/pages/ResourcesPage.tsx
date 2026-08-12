@@ -1,25 +1,17 @@
 import { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { fetchWithAuth } from '../api/client'
+import Layout from '../components/Layout'
+import { getToken, logout } from '../utils/auth'
 import '../App.css'
 
 function ResourcesPage() {
   const navigate = useNavigate()
-  const [token, setToken] = useState(() => localStorage.getItem('token') ?? '')
+  const token = getToken()
   const [resources, setResources] = useState<unknown[]>([])
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [description, setDescription] = useState('')
-
-  if (!token) {
-    return <Navigate to="/login" replace />
-  }
-
-  function logout() {
-    localStorage.removeItem('token')
-    setToken('')
-    navigate('/login')
-  }
 
   async function handleFetchResources(authToken = token) {
     try {
@@ -27,7 +19,7 @@ function ResourcesPage() {
       const data = await res.json()
       setResources(data)
     } catch {
-      logout()
+      logout(navigate)
     }
   }
 
@@ -45,17 +37,12 @@ function ResourcesPage() {
       })
       await handleFetchResources(authToken)
     } catch {
-      logout()
+      logout(navigate)
     }
   }
 
   return (
-    <>
-      <h1>SteerLog — 教材一覧</h1>
-      <button type="button" onClick={() => logout()}>
-        Logout
-      </button>
-
+    <Layout title="教材一覧">
       <button type="button" onClick={() => handleFetchResources()}>
         Fetch Resources
       </button>
@@ -86,7 +73,7 @@ function ResourcesPage() {
           )
         })}
       </ul>
-    </>
+    </Layout>
   )
 }
 

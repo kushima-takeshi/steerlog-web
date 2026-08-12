@@ -1,19 +1,17 @@
 import { useState } from 'react'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { fetchWithAuth } from '../api/client'
+import Layout from '../components/Layout'
+import { getToken, logout } from '../utils/auth'
 import '../App.css'
 
 function ResourceDetailPage() {
   const { resourceId } = useParams()
   const navigate = useNavigate()
-  const [token, setToken] = useState(() => localStorage.getItem('token') ?? '')
+  const token = getToken()
   const [resourceDetail, setResourceDetail] = useState<unknown | null>(null)
 
   const id = resourceId != null ? Number(resourceId) : NaN
-
-  if (!token) {
-    return <Navigate to="/login" replace />
-  }
 
   if (Number.isNaN(id)) {
     return (
@@ -24,28 +22,18 @@ function ResourceDetailPage() {
     )
   }
 
-  function logout() {
-    localStorage.removeItem('token')
-    setToken('')
-    navigate('/login')
-  }
-
   async function handleFetchResourceDetail(authToken = token) {
     try {
       const res = await fetchWithAuth(`/resources/${id}/details`, authToken)
       const data = await res.json()
       setResourceDetail(data)
     } catch {
-      logout()
+      logout(navigate)
     }
   }
 
   return (
-    <>
-      <h1>SteerLog — 教材詳細</h1>
-      <button type="button" onClick={() => logout()}>
-        Logout
-      </button>
+    <Layout title="教材詳細">
       <p>
         <Link to="/resources">教材一覧へ</Link>
       </p>
@@ -58,7 +46,7 @@ function ResourceDetailPage() {
         振り返りへ
       </button>
       <pre>{resourceDetail ? JSON.stringify(resourceDetail, null, 2) : '詳細なし'}</pre>
-    </>
+    </Layout>
   )
 }
 

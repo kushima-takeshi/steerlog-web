@@ -1,12 +1,14 @@
 import { useState } from 'react'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { fetchWithAuth } from '../api/client'
+import Layout from '../components/Layout'
+import { getToken, logout } from '../utils/auth'
 import '../App.css'
 
 function ReflectionPage() {
   const { resourceId } = useParams()
   const navigate = useNavigate()
-  const [token, setToken] = useState(() => localStorage.getItem('token') ?? '')
+  const token = getToken()
   const [learningSessionId, setLearningSessionId] = useState<number | null>(null)
   const [sessionStartResult, setSessionStartResult] = useState<unknown | null>(null)
   const [responseText, setResponseText] = useState('')
@@ -16,10 +18,6 @@ function ReflectionPage() {
 
   const id = resourceId != null ? Number(resourceId) : NaN
 
-  if (!token) {
-    return <Navigate to="/login" replace />
-  }
-
   if (Number.isNaN(id)) {
     return (
       <>
@@ -27,12 +25,6 @@ function ReflectionPage() {
         <Link to="/resources">教材一覧へ</Link>
       </>
     )
-  }
-
-  function logout() {
-    localStorage.removeItem('token')
-    setToken('')
-    navigate('/login')
   }
 
   async function handleSaveRecord(authToken = token) {
@@ -61,7 +53,7 @@ function ReflectionPage() {
       const data = await res.json()
       setRecordResult(data)
     } catch {
-      logout()
+      logout(navigate)
     }
   }
 
@@ -76,7 +68,7 @@ function ReflectionPage() {
       setLearningSessionId(data.learningSessionId)
       setSessionStartResult(data)
     } catch {
-      logout()
+      logout(navigate)
     }
   }
 
@@ -97,7 +89,7 @@ function ReflectionPage() {
       const data = await res.json()
       setResponseResult(data)
     } catch {
-      logout()
+      logout(navigate)
     }
   }
 
@@ -113,16 +105,12 @@ function ReflectionPage() {
       const data = await res.json()
       setCompleteResult(data)
     } catch {
-      logout()
+      logout(navigate)
     }
   }
 
   return (
-    <>
-      <h1>SteerLog — 振り返り</h1>
-      <button type="button" onClick={() => logout()}>
-        Logout
-      </button>
+    <Layout title="振り返り">
       <p>
         <Link to="/resources">教材一覧へ</Link>
         {' · '}
@@ -160,7 +148,7 @@ function ReflectionPage() {
         記録を保存
       </button>
       <pre>{recordResult ? JSON.stringify(recordResult, null, 2) : '記録未保存'}</pre>
-    </>
+    </Layout>
   )
 }
 

@@ -20,10 +20,20 @@ SteerLog のフロントエンド用リポジトリです。
 - [x] Phase 3: 教材一覧 + 作成
 - [x] Phase 4: リソース詳細（統合詳細 API）
 - [x] Phase 5: 学習フロー（振り返り IMMEDIATE_REFLECTION）
-- [ ] Phase 6: 画面分割（React Router）
+- [x] Phase 6: 画面分割（React Router）
 - [ ] Phase 7: UI 改善（モック）
 
-詳細は [`docs/12-frontend-plan.md`](https://github.com/kushima-takeshi/steerlog-api/blob/main/docs/12-frontend-plan.md) の Phase 6〜8 を参照。
+### ルート（Phase 6）
+
+| パス | 画面 |
+|------|------|
+| `/` | リダイレクト（未ログイン → `/login`、ログイン済み → `/resources`） |
+| `/login` | 登録 / ログイン |
+| `/resources` | 教材一覧 + 作成 |
+| `/resources/:resourceId` | 教材詳細 |
+| `/resources/:resourceId/reflection` | 振り返りフロー |
+
+詳細は [`docs/12-frontend-plan.md`](https://github.com/kushima-takeshi/steerlog-api/blob/main/docs/12-frontend-plan.md) の Phase 7〜8 を参照。
 
 ## セットアップ
 
