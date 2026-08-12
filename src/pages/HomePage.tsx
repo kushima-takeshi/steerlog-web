@@ -27,7 +27,7 @@ function HomePage() {
     return <Navigate to="/login" replace />
   }
 
-  function handleUnauthorized() {
+  function logout() {
     localStorage.removeItem('token')
     setToken('')
     navigate('/login')
@@ -39,7 +39,7 @@ function HomePage() {
       const data = await res.json()
       setResources(data)
     } catch {
-      handleUnauthorized()
+      logout()
     }
   }
 
@@ -57,7 +57,7 @@ function HomePage() {
       })
       await handleFetchResources(authToken)
     } catch {
-      handleUnauthorized()
+      logout()
     }
   }
 
@@ -72,7 +72,7 @@ function HomePage() {
       const data = await res.json()
       setResourceDetail(data)
     } catch {
-      handleUnauthorized()
+      logout()
     }
   }
 
@@ -102,7 +102,7 @@ function HomePage() {
       const data = await res.json()
       setRecordResult(data)
     } catch {
-      handleUnauthorized()
+      logout()
     }
   }
 
@@ -123,7 +123,7 @@ function HomePage() {
       setLearningSessionId(data.learningSessionId)
       setSessionStartResult(data)
     } catch {
-      handleUnauthorized()
+      logout()
     }
   }
 
@@ -144,7 +144,7 @@ function HomePage() {
       const data = await res.json()
       setResponseResult(data)
     } catch {
-      handleUnauthorized()
+      logout()
     }
   }
 
@@ -160,7 +160,7 @@ function HomePage() {
       const data = await res.json()
       setCompleteResult(data)
     } catch {
-      handleUnauthorized()
+      logout()
     }
   }
 
@@ -174,6 +174,9 @@ function HomePage() {
         </div>
         <div>
           <h1>SteerLog</h1>
+          <button type="button" onClick={() => logout()}>
+            Logout
+          </button>
           <p>
             Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
           </p>
