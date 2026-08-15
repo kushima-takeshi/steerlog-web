@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchWithAuth } from '../api/client'
 import Layout from '../components/Layout'
@@ -23,6 +23,10 @@ function ResourcesPage() {
     }
   }
 
+  useEffect(() => {
+    handleFetchResources()
+  }, [])
+
   async function handleCreateResource(authToken = token) {
     try {
       await fetchWithAuth('/resources', authToken, {
@@ -43,36 +47,70 @@ function ResourcesPage() {
 
   return (
     <Layout title="教材一覧">
-      <button type="button" onClick={() => handleFetchResources()}>
-        Fetch Resources
-      </button>
+      <section className="section">
+        <h2>新規作成</h2>
+        <div className="form-field">
+          <label htmlFor="resource-title">タイトル</label>
+          <input
+            id="resource-title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+        <div className="form-field">
+          <label htmlFor="resource-author">著者</label>
+          <input
+            id="resource-author"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+          />
+        </div>
+        <div className="form-field">
+          <label htmlFor="resource-description">説明</label>
+          <input
+            id="resource-description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+        <button type="button" onClick={() => handleCreateResource()}>
+          教材を作成
+        </button>
+      </section>
 
-      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
-      <input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="Author" />
-      <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" />
-      <button type="button" onClick={() => handleCreateResource()}>
-        教材を作成
-      </button>
-
-      <ul>
-        {resources.map((resource, index) => {
-          const item = resource as { resourceId?: number; title?: string }
-          return (
-            <li key={item.resourceId ?? index}>
-              <button
-                type="button"
-                onClick={() => {
-                  if (item.resourceId != null) {
-                    navigate(`/resources/${item.resourceId}`)
-                  }
-                }}
-              >
-                {item.title ?? '(No title)'}
-              </button>
-            </li>
-          )
-        })}
-      </ul>
+      <section className="section">
+        <h2>教材一覧</h2>
+        {resources.length === 0 ? (
+          <p className="empty-message">教材がありません。上のフォームから追加してください。</p>
+        ) : (
+          <div className="resource-list">
+            {resources.map((resource, index) => {
+              const item = resource as {
+                resourceId?: number
+                title?: string
+                author?: string
+                description?: string
+              }
+              return (
+                <button
+                  key={item.resourceId ?? index}
+                  type="button"
+                  className="resource-card"
+                  onClick={() => {
+                    if (item.resourceId != null) {
+                      navigate(`/resources/${item.resourceId}`)
+                    }
+                  }}
+                >
+                  <strong>{item.title ?? '(No title)'}</strong>
+                  {item.author ? <p>著者: {item.author}</p> : null}
+                  {item.description ? <p>{item.description}</p> : null}
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </section>
     </Layout>
   )
 }
