@@ -80,32 +80,36 @@ function ResourcesPage() {
 
       <section className="section">
         <h2>教材一覧</h2>
-        <div className="resource-list">
-          {resources.map((resource, index) => {
-            const item = resource as {
-              resourceId?: number
-              title?: string
-              author?: string
-              description?: string
-            }
-            return (
-              <button
-                key={item.resourceId ?? index}
-                type="button"
-                className="resource-card"
-                onClick={() => {
-                  if (item.resourceId != null) {
-                    navigate(`/resources/${item.resourceId}`)
-                  }
-                }}
-              >
-                <strong>{item.title ?? '(No title)'}</strong>
-                {item.author ? <p>著者: {item.author}</p> : null}
-                {item.description ? <p>{item.description}</p> : null}
-              </button>
-            )
-          })}
-        </div>
+        {resources.length === 0 ? (
+          <p className="empty-message">教材がありません。上のフォームから追加してください。</p>
+        ) : (
+          <div className="resource-list">
+            {resources.map((resource, index) => {
+              const item = resource as {
+                resourceId?: number
+                title?: string
+                author?: string
+                description?: string
+              }
+              return (
+                <button
+                  key={item.resourceId ?? index}
+                  type="button"
+                  className="resource-card"
+                  onClick={() => {
+                    if (item.resourceId != null) {
+                      navigate(`/resources/${item.resourceId}`)
+                    }
+                  }}
+                >
+                  <strong>{item.title ?? '(No title)'}</strong>
+                  {item.author ? <p>著者: {item.author}</p> : null}
+                  {item.description ? <p>{item.description}</p> : null}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </section>
     </Layout>
   )
