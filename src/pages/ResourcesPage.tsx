@@ -80,25 +80,32 @@ function ResourcesPage() {
 
       <section className="section">
         <h2>教材一覧</h2>
-        <ul>
+        <div className="resource-list">
           {resources.map((resource, index) => {
-            const item = resource as { resourceId?: number; title?: string }
+            const item = resource as {
+              resourceId?: number
+              title?: string
+              author?: string
+              description?: string
+            }
             return (
-              <li key={item.resourceId ?? index}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (item.resourceId != null) {
-                      navigate(`/resources/${item.resourceId}`)
-                    }
-                  }}
-                >
-                  {item.title ?? '(No title)'}
-                </button>
-              </li>
+              <button
+                key={item.resourceId ?? index}
+                type="button"
+                className="resource-card"
+                onClick={() => {
+                  if (item.resourceId != null) {
+                    navigate(`/resources/${item.resourceId}`)
+                  }
+                }}
+              >
+                <strong>{item.title ?? '(No title)'}</strong>
+                {item.author ? <p>著者: {item.author}</p> : null}
+                {item.description ? <p>{item.description}</p> : null}
+              </button>
             )
           })}
-        </ul>
+        </div>
       </section>
     </Layout>
   )
