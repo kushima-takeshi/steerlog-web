@@ -1,1 +1,73 @@
-/* App-level styles (Phase 7 で各画面のスタイルを追加) */
+/* ResourcesPage (Phase 7 Step 1) */
+
+main {
+  padding: 0 24px 32px;
+  text-align: left;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  max-width: 480px;
+}
+
+.form-field label {
+  font-size: 0.875rem;
+  color: var(--text-h);
+}
+
+.form-field input {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+}
+
+.resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 640px;
+}
+
+.resource-card {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.resource-card:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.resource-card strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text-h);
+}
+
+.resource-card p {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+}
+
+.empty-message {
+  color: var(--text);
+  font-size: 0.9375rem;
+}
