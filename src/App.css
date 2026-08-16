@@ -22,13 +22,20 @@ main {
   color: var(--text-h);
 }
 
-.form-field input {
+.form-field input,
+.form-field textarea {
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg);
   color: var(--text-h);
   font: inherit;
+}
+
+.form-field textarea {
+  min-height: 120px;
+  resize: vertical;
+  max-width: 640px;
 }
 
 .resource-list {

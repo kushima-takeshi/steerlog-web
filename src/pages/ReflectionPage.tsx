@@ -17,22 +17,47 @@ function ReflectionPage() {
   const [recordResult, setRecordResult] = useState<unknown | null>(null)
 
   const id = resourceId != null ? Number(resourceId) : NaN
+  const isValidId = !Number.isNaN(id)
 
-  if (Number.isNaN(id)) {
-    return (
-      <>
-        <p>Invalid resource ID</p>
-        <Link to="/resources">教材一覧へ</Link>
-      </>
-    )
-  }
+  const sessionStart = sessionStartResult as {
+    aiPrompt?: string
+    step?: { currentStep?: number; totalSteps?: number }
+  } | null
+
+  const responseSubmit = responseResult as {
+    aiPrompt?: string
+    step?: { currentStep?: number; totalSteps?: number }
+  } | null
+
+  const answerStep = responseSubmit?.step ?? sessionStart?.step
+
+  const sessionComplete = completeResult as {
+    status?: string
+    completedAt?: string
+    resultDraft?: {
+      summary?: string
+      conceptTags?: string[]
+      weakPointSummary?: string
+      nextAction?: string
+      aiAssessment?: string
+    }
+  } | null
+
+  const resultDraft = sessionComplete?.resultDraft
+
+  const savedRecord = recordResult as {
+    summary?: string
+    conceptTags?: string[]
+    weakPointSummary?: string
+    nextAction?: string
+    aiAssessment?: string
+    sessionType?: string
+    createdAt?: string
+  } | null
 
   async function handleSaveRecord(authToken = token) {
     if (learningSessionId === null) return
-    if (!completeResult) return
-
-    const draft = (completeResult as { resultDraft?: Record<string, unknown> }).resultDraft
-    if (!draft) return
+    if (!resultDraft) return
 
     try {
       const res = await fetchWithAuth(
@@ -42,11 +67,11 @@ function ReflectionPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            summary: draft.summary,
-            conceptTags: draft.conceptTags,
-            weakPointSummary: draft.weakPointSummary,
-            nextAction: draft.nextAction,
-            aiAssessment: draft.aiAssessment,
+            summary: resultDraft.summary,
+            conceptTags: resultDraft.conceptTags,
+            weakPointSummary: resultDraft.weakPointSummary,
+            nextAction: resultDraft.nextAction,
+            aiAssessment: resultDraft.aiAssessment,
           }),
         },
       )
@@ -58,6 +83,7 @@ function ReflectionPage() {
   }
 
   async function handleStartLearningSession(authToken = token) {
+    if (!isValidId) return
     try {
       const res = await fetchWithAuth(`/resources/${id}/learning-sessions`, authToken, {
         method: 'POST',
@@ -109,6 +135,15 @@ function ReflectionPage() {
     }
   }
 
+  if (!isValidId) {
+    return (
+      <>
+        <p>Invalid resource ID</p>
+        <Link to="/resources">教材一覧へ</Link>
+      </>
+    )
+  }
+
   return (
     <Layout title="振り返り">
       <p>
@@ -117,37 +152,157 @@ function ReflectionPage() {
         <Link to={`/resources/${id}`}>教材詳細へ</Link>
       </p>
 
-      <p>Resource ID: {id}</p>
+      <section className="section">
+        <h2>振り返りを開始</h2>
+        <p>学習直後の振り返りチェックを開始します。問いに自分の言葉で答えていきます。</p>
+        {!sessionStartResult ? (
+          <button type="button" onClick={() => handleStartLearningSession()}>
+            振り返りを開始
+          </button>
+        ) : (
+          <>
+            <p>振り返りセッションを開始しました。</p>
+            {sessionStart?.aiPrompt ? (
+              <p>
+                <strong>問い:</strong> {sessionStart.aiPrompt}
+              </p>
+            ) : null}
+          </>
+        )}
+      </section>
 
-      <button type="button" onClick={() => handleStartLearningSession()}>
-        振り返りを開始
-      </button>
-      <p>LearningSessionId: {learningSessionId ?? 'none'}</p>
-      <pre>{sessionStartResult ? JSON.stringify(sessionStartResult, null, 2) : 'セッション未開始'}</pre>
+      {sessionStartResult ? (
+        <section className="section">
+          <h2>回答</h2>
+          {answerStep?.currentStep != null && answerStep?.totalSteps != null ? (
+            <p>
+              進捗: Step {answerStep.currentStep} / {answerStep.totalSteps}
+            </p>
+          ) : null}
+          <div className="form-field">
+            <label htmlFor="reflection-response">あなたの回答</label>
+            <textarea
+              id="reflection-response"
+              value={responseText}
+              onChange={(e) => setResponseText(e.target.value)}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => handleSubmitResponse()}
+            disabled={learningSessionId === null || responseText.trim() === ''}
+          >
+            回答を送信
+          </button>
+          {responseSubmit?.aiPrompt ? (
+            <p>
+              <strong>次の問い:</strong> {responseSubmit.aiPrompt}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
 
-      <textarea value={responseText} onChange={(e) => setResponseText(e.target.value)} placeholder="回答を入力" />
-      <button
-        type="button"
-        onClick={() => handleSubmitResponse()}
-        disabled={learningSessionId === null || responseText.trim() === ''}
-      >
-        回答を送信
-      </button>
-      <pre>{responseResult ? JSON.stringify(responseResult, null, 2) : '回答未送信'}</pre>
+      {sessionStartResult ? (
+        <section className="section">
+          <h2>確認</h2>
+          <p>すべての問いに答えたら、セッションを完了して振り返り内容を確認します。</p>
+          {!completeResult ? (
+            <button
+              type="button"
+              onClick={() => handleCompleteSession()}
+              disabled={learningSessionId === null}
+            >
+              セッションを完了
+            </button>
+          ) : (
+            <>
+              <p>セッションを完了しました。</p>
+              {sessionComplete?.status ? <p>状態: {sessionComplete.status}</p> : null}
+              {sessionComplete?.completedAt ? <p>完了日時: {sessionComplete.completedAt}</p> : null}
+              {resultDraft ? (
+                <>
+                  {resultDraft.summary ? (
+                    <p>
+                      <strong>要約:</strong> {resultDraft.summary}
+                    </p>
+                  ) : null}
+                  {resultDraft.conceptTags && resultDraft.conceptTags.length > 0 ? (
+                    <p>
+                      <strong>概念タグ:</strong> {resultDraft.conceptTags.join(', ')}
+                    </p>
+                  ) : null}
+                  {resultDraft.weakPointSummary ? (
+                    <p>
+                      <strong>弱点:</strong> {resultDraft.weakPointSummary}
+                    </p>
+                  ) : null}
+                  {resultDraft.nextAction ? (
+                    <p>
+                      <strong>次のアクション:</strong> {resultDraft.nextAction}
+                    </p>
+                  ) : null}
+                  {resultDraft.aiAssessment ? (
+                    <p>
+                      <strong>AI評価:</strong> {resultDraft.aiAssessment}
+                    </p>
+                  ) : null}
+                </>
+              ) : null}
+            </>
+          )}
+        </section>
+      ) : null}
 
-      <button type="button" onClick={() => handleCompleteSession()} disabled={learningSessionId === null}>
-        セッションを完了
-      </button>
-      <pre>{completeResult ? JSON.stringify(completeResult, null, 2) : 'セッション未完了'}</pre>
-
-      <button
-        type="button"
-        onClick={() => handleSaveRecord()}
-        disabled={learningSessionId === null || !completeResult}
-      >
-        記録を保存
-      </button>
-      <pre>{recordResult ? JSON.stringify(recordResult, null, 2) : '記録未保存'}</pre>
+      {completeResult ? (
+        <section className="section">
+          <h2>完了</h2>
+          <p>内容を確認したら、振り返り記録を保存します。</p>
+          {!recordResult ? (
+            <button
+              type="button"
+              className="primary-action"
+              onClick={() => handleSaveRecord()}
+              disabled={learningSessionId === null || !resultDraft}
+            >
+              記録を保存
+            </button>
+          ) : (
+            <>
+              <p>記録を保存しました。</p>
+              {savedRecord?.sessionType ? <p>種別: {savedRecord.sessionType}</p> : null}
+              {savedRecord?.createdAt ? <p>保存日時: {savedRecord.createdAt}</p> : null}
+              {savedRecord?.summary ? (
+                <p>
+                  <strong>要約:</strong> {savedRecord.summary}
+                </p>
+              ) : null}
+              {savedRecord?.conceptTags && savedRecord.conceptTags.length > 0 ? (
+                <p>
+                  <strong>概念タグ:</strong> {savedRecord.conceptTags.join(', ')}
+                </p>
+              ) : null}
+              {savedRecord?.weakPointSummary ? (
+                <p>
+                  <strong>弱点:</strong> {savedRecord.weakPointSummary}
+                </p>
+              ) : null}
+              {savedRecord?.nextAction ? (
+                <p>
+                  <strong>次のアクション:</strong> {savedRecord.nextAction}
+                </p>
+              ) : null}
+              {savedRecord?.aiAssessment ? (
+                <p>
+                  <strong>AI評価:</strong> {savedRecord.aiAssessment}
+                </p>
+              ) : null}
+              <p>
+                <Link to={`/resources/${id}`}>教材詳細で記録を確認する</Link>
+              </p>
+            </>
+          )}
+        </section>
+      ) : null}
     </Layout>
   )
 }
