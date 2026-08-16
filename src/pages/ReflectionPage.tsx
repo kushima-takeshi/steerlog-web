@@ -19,9 +19,31 @@ function ReflectionPage() {
   const id = resourceId != null ? Number(resourceId) : NaN
   const isValidId = !Number.isNaN(id)
 
-  const sessionStart = sessionStartResult as { aiPrompt?: string } | null
+  const sessionStart = sessionStartResult as {
+    aiPrompt?: string
+    step?: { currentStep?: number; totalSteps?: number }
+  } | null
 
-  async function handleSaveRecord(authToken = token) {
+  const responseSubmit = responseResult as {
+    aiPrompt?: string
+    step?: { currentStep?: number; totalSteps?: number }
+  } | null
+
+  const answerStep = responseSubmit?.step ?? sessionStart?.step
+
+  const sessionComplete = completeResult as {
+    status?: string
+    completedAt?: string
+    resultDraft?: {
+      summary?: string
+      conceptTags?: string[]
+      weakPointSummary?: string
+      nextAction?: string
+      aiAssessment?: string
+    }
+  } | null
+
+  const resultDraft = sessionComplete?.resultDraft
     if (learningSessionId === null) return
     if (!completeResult) return
 
@@ -140,15 +162,36 @@ function ReflectionPage() {
         )}
       </section>
 
-      <textarea value={responseText} onChange={(e) => setResponseText(e.target.value)} placeholder="回答を入力" />
-      <button
-        type="button"
-        onClick={() => handleSubmitResponse()}
-        disabled={learningSessionId === null || responseText.trim() === ''}
-      >
-        回答を送信
-      </button>
-      <pre>{responseResult ? JSON.stringify(responseResult, null, 2) : '回答未送信'}</pre>
+      {sessionStartResult ? (
+        <section className="section">
+          <h2>回答</h2>
+          {answerStep?.currentStep != null && answerStep?.totalSteps != null ? (
+            <p>
+              進捗: Step {answerStep.currentStep} / {answerStep.totalSteps}
+            </p>
+          ) : null}
+          <div className="form-field">
+            <label htmlFor="reflection-response">あなたの回答</label>
+            <textarea
+              id="reflection-response"
+              value={responseText}
+              onChange={(e) => setResponseText(e.target.value)}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => handleSubmitResponse()}
+            disabled={learningSessionId === null || responseText.trim() === ''}
+          >
+            回答を送信
+          </button>
+          {responseSubmit?.aiPrompt ? (
+            <p>
+              <strong>次の問い:</strong> {responseSubmit.aiPrompt}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
 
       <button type="button" onClick={() => handleCompleteSession()} disabled={learningSessionId === null}>
         セッションを完了
