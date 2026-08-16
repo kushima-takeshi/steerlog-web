@@ -7,7 +7,6 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [result, setResult] = useState('')
 
   if (localStorage.getItem('token')) {
     return <Navigate to="/resources" replace />
@@ -23,13 +22,10 @@ export default function LoginPage() {
     localStorage.setItem('token', data.accessToken)
 
     try {
-      const meRes = await fetchWithAuth('/auth/me', data.accessToken)
-      const me = await meRes.json()
-      setResult(JSON.stringify(me, null, 2))
+      await fetchWithAuth('/auth/me', data.accessToken)
       navigate('/resources')
     } catch {
       localStorage.removeItem('token')
-      setResult('ログインし直してください')
     }
   }
 
@@ -43,38 +39,44 @@ export default function LoginPage() {
     localStorage.setItem('token', data.accessToken)
 
     try {
-      const meRes = await fetchWithAuth('/auth/me', data.accessToken)
-      const me = await meRes.json()
-      setResult(JSON.stringify(me, null, 2))
+      await fetchWithAuth('/auth/me', data.accessToken)
       navigate('/resources')
     } catch {
       localStorage.removeItem('token')
-      setResult('ログインし直してください')
     }
   }
 
   return (
-    <>
+    <main>
       <h1>SteerLog</h1>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-      />
-      <pre>{result}</pre>
-      <button type="button" onClick={() => handleRegister()}>
-        Register
-      </button>
-      <button type="button" onClick={() => handleLogin()}>
-        Login
-      </button>
-    </>
+      <section className="section">
+        <h2>ログイン</h2>
+        <p>メールアドレスとパスワードで登録またはログインしてください。</p>
+        <div className="form-field">
+          <label htmlFor="login-email">メールアドレス</label>
+          <input
+            id="login-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div className="form-field">
+          <label htmlFor="login-password">パスワード</label>
+          <input
+            id="login-password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <button type="button" onClick={() => handleRegister()}>
+          登録
+        </button>
+        <button type="button" onClick={() => handleLogin()}>
+          ログイン
+        </button>
+      </section>
+    </main>
   )
 }
