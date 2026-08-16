@@ -81,10 +81,6 @@ function ResourceDetailPage() {
         <Link to="/resources">教材一覧へ</Link>
       </p>
 
-      <button type="button" onClick={() => navigate(`/resources/${id}/reflection`)}>
-        振り返りへ
-      </button>
-
       {!resourceDetail ? (
         <p className="empty-message">読み込み中…</p>
       ) : (
@@ -108,10 +104,20 @@ function ResourceDetailPage() {
             </section>
           ) : null}
 
+          <section className="section">
+            <button
+              type="button"
+              className="primary-action"
+              onClick={() => navigate(`/resources/${id}/reflection`)}
+            >
+              振り返りへ
+            </button>
+          </section>
+
           {sections && sections.length > 0 ? (
             <section className="section">
               <h2>セクション</h2>
-              <ul>
+              <ul className="info-list">
                 {sections.map((section, index) => (
                   <li key={section.sectionOrder ?? index}>
                     {section.sectionOrder != null ? `${section.sectionOrder}. ` : ''}
@@ -126,7 +132,7 @@ function ResourceDetailPage() {
           {memos && memos.length > 0 ? (
             <section className="section">
               <h2>メモ</h2>
-              <ul>
+              <ul className="info-list">
                 {memos.map((memo, index) => (
                   <li key={index}>
                     {memo.memoType ? `[${memo.memoType}] ` : ''}
@@ -141,7 +147,7 @@ function ResourceDetailPage() {
           {levelHistories && levelHistories.length > 0 ? (
             <section className="section">
               <h2>レベル履歴</h2>
-              <ul>
+              <ul className="info-list">
                 {levelHistories.map((history, index) => (
                   <li key={index}>
                     Lv.{history.level ?? '?'}
@@ -156,7 +162,7 @@ function ResourceDetailPage() {
           {learningSessionRecords && learningSessionRecords.length > 0 ? (
             <section className="section">
               <h2>振り返り記録</h2>
-              <ul>
+              <ul className="info-list">
                 {learningSessionRecords.map((record, index) => (
                   <li key={index}>
                     {record.sessionType ? `[${record.sessionType}] ` : ''}

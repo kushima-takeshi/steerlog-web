@@ -71,3 +71,29 @@ main {
   color: var(--text);
   font-size: 0.9375rem;
 }
+
+/* ResourceDetailPage (Phase 7 Step 2) */
+
+.primary-action {
+  padding: 10px 20px;
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  background: var(--accent-bg);
+  color: var(--text-h);
+  font: inherit;
+  cursor: pointer;
+}
+
+.primary-action:hover {
+  background: var(--accent-border);
+}
+
+.info-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  max-width: 640px;
+}
+
+.info-list li {
+  margin-bottom: 8px;
+}
