@@ -44,11 +44,10 @@ function ReflectionPage() {
   } | null
 
   const resultDraft = sessionComplete?.resultDraft
-    if (learningSessionId === null) return
-    if (!completeResult) return
 
-    const draft = (completeResult as { resultDraft?: Record<string, unknown> }).resultDraft
-    if (!draft) return
+  async function handleSaveRecord(authToken = token) {
+    if (learningSessionId === null) return
+    if (!resultDraft) return
 
     try {
       const res = await fetchWithAuth(
@@ -58,11 +57,11 @@ function ReflectionPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            summary: draft.summary,
-            conceptTags: draft.conceptTags,
-            weakPointSummary: draft.weakPointSummary,
-            nextAction: draft.nextAction,
-            aiAssessment: draft.aiAssessment,
+            summary: resultDraft.summary,
+            conceptTags: resultDraft.conceptTags,
+            weakPointSummary: resultDraft.weakPointSummary,
+            nextAction: resultDraft.nextAction,
+            aiAssessment: resultDraft.aiAssessment,
           }),
         },
       )
@@ -193,10 +192,56 @@ function ReflectionPage() {
         </section>
       ) : null}
 
-      <button type="button" onClick={() => handleCompleteSession()} disabled={learningSessionId === null}>
-        セッションを完了
-      </button>
-      <pre>{completeResult ? JSON.stringify(completeResult, null, 2) : 'セッション未完了'}</pre>
+      {sessionStartResult ? (
+        <section className="section">
+          <h2>確認</h2>
+          <p>すべての問いに答えたら、セッションを完了して振り返り内容を確認します。</p>
+          {!completeResult ? (
+            <button
+              type="button"
+              onClick={() => handleCompleteSession()}
+              disabled={learningSessionId === null}
+            >
+              セッションを完了
+            </button>
+          ) : (
+            <>
+              <p>セッションを完了しました。</p>
+              {sessionComplete?.status ? <p>状態: {sessionComplete.status}</p> : null}
+              {sessionComplete?.completedAt ? <p>完了日時: {sessionComplete.completedAt}</p> : null}
+              {resultDraft ? (
+                <>
+                  {resultDraft.summary ? (
+                    <p>
+                      <strong>要約:</strong> {resultDraft.summary}
+                    </p>
+                  ) : null}
+                  {resultDraft.conceptTags && resultDraft.conceptTags.length > 0 ? (
+                    <p>
+                      <strong>概念タグ:</strong> {resultDraft.conceptTags.join(', ')}
+                    </p>
+                  ) : null}
+                  {resultDraft.weakPointSummary ? (
+                    <p>
+                      <strong>弱点:</strong> {resultDraft.weakPointSummary}
+                    </p>
+                  ) : null}
+                  {resultDraft.nextAction ? (
+                    <p>
+                      <strong>次のアクション:</strong> {resultDraft.nextAction}
+                    </p>
+                  ) : null}
+                  {resultDraft.aiAssessment ? (
+                    <p>
+                      <strong>AI評価:</strong> {resultDraft.aiAssessment}
+                    </p>
+                  ) : null}
+                </>
+              ) : null}
+            </>
+          )}
+        </section>
+      ) : null}
 
       <button
         type="button"
