@@ -17,15 +17,9 @@ function ReflectionPage() {
   const [recordResult, setRecordResult] = useState<unknown | null>(null)
 
   const id = resourceId != null ? Number(resourceId) : NaN
+  const isValidId = !Number.isNaN(id)
 
-  if (Number.isNaN(id)) {
-    return (
-      <>
-        <p>Invalid resource ID</p>
-        <Link to="/resources">教材一覧へ</Link>
-      </>
-    )
-  }
+  const sessionStart = sessionStartResult as { aiPrompt?: string } | null
 
   async function handleSaveRecord(authToken = token) {
     if (learningSessionId === null) return
@@ -58,6 +52,7 @@ function ReflectionPage() {
   }
 
   async function handleStartLearningSession(authToken = token) {
+    if (!isValidId) return
     try {
       const res = await fetchWithAuth(`/resources/${id}/learning-sessions`, authToken, {
         method: 'POST',
@@ -109,6 +104,15 @@ function ReflectionPage() {
     }
   }
 
+  if (!isValidId) {
+    return (
+      <>
+        <p>Invalid resource ID</p>
+        <Link to="/resources">教材一覧へ</Link>
+      </>
+    )
+  }
+
   return (
     <Layout title="振り返り">
       <p>
@@ -117,13 +121,24 @@ function ReflectionPage() {
         <Link to={`/resources/${id}`}>教材詳細へ</Link>
       </p>
 
-      <p>Resource ID: {id}</p>
-
-      <button type="button" onClick={() => handleStartLearningSession()}>
-        振り返りを開始
-      </button>
-      <p>LearningSessionId: {learningSessionId ?? 'none'}</p>
-      <pre>{sessionStartResult ? JSON.stringify(sessionStartResult, null, 2) : 'セッション未開始'}</pre>
+      <section className="section">
+        <h2>振り返りを開始</h2>
+        <p>学習直後の振り返りチェックを開始します。問いに自分の言葉で答えていきます。</p>
+        {!sessionStartResult ? (
+          <button type="button" onClick={() => handleStartLearningSession()}>
+            振り返りを開始
+          </button>
+        ) : (
+          <>
+            <p>振り返りセッションを開始しました。</p>
+            {sessionStart?.aiPrompt ? (
+              <p>
+                <strong>問い:</strong> {sessionStart.aiPrompt}
+              </p>
+            ) : null}
+          </>
+        )}
+      </section>
 
       <textarea value={responseText} onChange={(e) => setResponseText(e.target.value)} placeholder="回答を入力" />
       <button
