@@ -45,6 +45,16 @@ function ReflectionPage() {
 
   const resultDraft = sessionComplete?.resultDraft
 
+  const savedRecord = recordResult as {
+    summary?: string
+    conceptTags?: string[]
+    weakPointSummary?: string
+    nextAction?: string
+    aiAssessment?: string
+    sessionType?: string
+    createdAt?: string
+  } | null
+
   async function handleSaveRecord(authToken = token) {
     if (learningSessionId === null) return
     if (!resultDraft) return
@@ -243,14 +253,56 @@ function ReflectionPage() {
         </section>
       ) : null}
 
-      <button
-        type="button"
-        onClick={() => handleSaveRecord()}
-        disabled={learningSessionId === null || !completeResult}
-      >
-        記録を保存
-      </button>
-      <pre>{recordResult ? JSON.stringify(recordResult, null, 2) : '記録未保存'}</pre>
+      {completeResult ? (
+        <section className="section">
+          <h2>完了</h2>
+          <p>内容を確認したら、振り返り記録を保存します。</p>
+          {!recordResult ? (
+            <button
+              type="button"
+              className="primary-action"
+              onClick={() => handleSaveRecord()}
+              disabled={learningSessionId === null || !resultDraft}
+            >
+              記録を保存
+            </button>
+          ) : (
+            <>
+              <p>記録を保存しました。</p>
+              {savedRecord?.sessionType ? <p>種別: {savedRecord.sessionType}</p> : null}
+              {savedRecord?.createdAt ? <p>保存日時: {savedRecord.createdAt}</p> : null}
+              {savedRecord?.summary ? (
+                <p>
+                  <strong>要約:</strong> {savedRecord.summary}
+                </p>
+              ) : null}
+              {savedRecord?.conceptTags && savedRecord.conceptTags.length > 0 ? (
+                <p>
+                  <strong>概念タグ:</strong> {savedRecord.conceptTags.join(', ')}
+                </p>
+              ) : null}
+              {savedRecord?.weakPointSummary ? (
+                <p>
+                  <strong>弱点:</strong> {savedRecord.weakPointSummary}
+                </p>
+              ) : null}
+              {savedRecord?.nextAction ? (
+                <p>
+                  <strong>次のアクション:</strong> {savedRecord.nextAction}
+                </p>
+              ) : null}
+              {savedRecord?.aiAssessment ? (
+                <p>
+                  <strong>AI評価:</strong> {savedRecord.aiAssessment}
+                </p>
+              ) : null}
+              <p>
+                <Link to={`/resources/${id}`}>教材詳細で記録を確認する</Link>
+              </p>
+            </>
+          )}
+        </section>
+      ) : null}
     </Layout>
   )
 }
